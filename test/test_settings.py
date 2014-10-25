@@ -12,15 +12,15 @@ from cloudfs.errors import OperationNotAllowed, MethodNotImplemented
 class CloudFSTestCase(unittest.TestCase):
     # fill in with the details from your cloudfs account
     # Application Client ID
-    CLOUDFS_ID = 'WFZLqxhV5Qz1KzUg9s-xMNlUPd804zygxouCG2pLWVg'
+    CLOUDFS_ID = ''
     # Application Secret
-    CLOUDFS_SECRET = 'i_vz5d_GHADe9dHEKyMVTyqxrgU0UQDYOxgXuc1EisSulFzVs9he3CzFzygZh-84EhJyhk2l7T5nR6GnSMHLvQ'
+    CLOUDFS_SECRET = ''
     # Application API Server
-    CLOUDFS_BASE = 'mmst1awe4a.cloudfs.io'
+    CLOUDFS_BASE = ''
 
     # user settings
-    TEST_USER_EMAIL = 'test@test.com'
-    TEST_USER_PASSWORD = '111111'
+    TEST_USER_EMAIL = ''
+    TEST_USER_PASSWORD = ''
 
     # not needed for setting up your account
 
