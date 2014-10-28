@@ -79,6 +79,11 @@ class AuthenticatedError(CloudFSError):
         return '\nRequest:\n{}\nResponse:\n{}'.format(request_to_string(self.request), response_to_string(self.response))
 
 
+class UnknownError(AuthenticatedError):
+    def __str__(self):
+        super_str = super(UnknownError, self).__str__()
+        return "CloudFS returned an error with an unexpected error code! Please forward this exceptions' text to CloudFS support:\n" + super_str
+
 class InvalidRequest(AuthenticatedError):
     # No code for malformed request
     INTERNAL_CODE = None
@@ -87,9 +92,17 @@ class GenericPanicError(AuthenticatedError):
     # generic error for when something goes wrong on CloudFS's end
     INTERNAL_CODE = 9999
 
+# API Errors
+
+class APIError(AuthenticatedError):
+    INTERNAL_CODE = 9000
+
+class APICallLimitReached(APIError):
+    INTERNAL_CODE = 9006
+
 # filesystem errors
-# 3 errors
-# 1 raised / exist
+# 5 errors
+# 3 raised / exist
 
 class FilesystemError(AuthenticatedError):
     # does not exist, but defines the domain
@@ -103,6 +116,12 @@ class VersionMismatchIgnored(FilesystemError):
 
 class OrigionalPathNoLongerExists(FilesystemError):
     INTERNAL_CODE = 8004
+
+class FilesystemIsOverTheLimit(FilesystemError):
+    INTERNAL_CODE = 8007
+
+class FilesystemWouldBeOverTheLimit(FilesystemError):
+    INTERNAL_CODE = 8008
 
 # share errors
 # 4 errors
@@ -344,9 +363,9 @@ def error_from_response(request, response):
             message = response_json['error']['message']
             try:
                 error_class = _error_index[code]
-            except ValueError:
+            except KeyError:
                 # CloudFS instead of authenticated error because we don't really know
-                raise CloudFSError("Got error response from CloudFS servers with code {}, but no matching python exception! Response JSON:\n{}".format(code, response.content))
+                raise UnknownError(request, response, message)
 
             return error_class(request, response, message)
 

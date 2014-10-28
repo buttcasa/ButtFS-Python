@@ -49,7 +49,6 @@ class FileFunctionalTests(SessionTestCase):
         file_pointer = open(self.new_file_path, 'r')
         expected_contents = file_pointer.read()
         file_pointer.close()
-        # def download(self, local_path, custom_name=None, synchronous=False, debug=False):
 
         test_cases = [
             (self.download_directory, None, os.path.join(self.download_directory, file.name)),
@@ -129,12 +128,6 @@ class FileFunctionalTests(SessionTestCase):
     def test_unimplemented_methods(self):
         self.assertRaises(
             MethodNotImplemented,
-            self.new_file.restore,
-            ''
-        )
-
-        self.assertRaises(
-            MethodNotImplemented,
             self.new_file.history
         )
 
@@ -143,7 +136,7 @@ class FileFunctionalTests(SessionTestCase):
         if os.path.exists(self.download_directory):
             shutil.rmtree(self.download_directory)
         for folder in self.root.list():
-            folder.delete(force=True)
+            folder.delete(force=True, commit=True)
 
 
 

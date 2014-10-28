@@ -1,6 +1,6 @@
 
 from private.filesystem_common import move_items, copy_items
-from private.cloudfs_paths import VersionConflictValue, ExistValues
+from private.cloudfs_paths import VersionConflictValue, ExistValues, RestoreValue
 from errors import operation_not_allowed, method_not_implemented
 from private.cached_object import CachedObject
 from path import Path
@@ -13,9 +13,11 @@ class Item(CachedObject):
         self.data = {}
         self.rest_interface = rest_interface
         self.changed_meta = set()
+        self.in_trash = False
 
-    def _create_from_json(self, data, parent_path):
+    def _create_from_json(self, data, parent_path, in_trash=False):
         self._initialize_self(data, {})
+        self.in_trash = in_trash
 
         if not parent_path:
             self._full_path = Path.path_from_string('/')
@@ -184,13 +186,16 @@ class Item(CachedObject):
     def save(self, if_conflict=VersionConflictValue.fail, debug=False):
         raise Exception('Save not implemented for item base class!')
 
-    def restore(self, dest):
-        """NOT IMPLEMENTED: Restore item from trash.
+    def restore(self, restore_method=RestoreValue.fail, method_argument=None):
+        """Restore item from trash.
         REST documentation: https://www.bitcasa.com/cloudfs-api-docs/api/Recover%20Trash%20Item.html
         :param dest:
         :return:
         """
-        raise method_not_implemented(self, 'restore')
+        if self.in_trash:
+            # TODO: Should we filter on this? It should be reliable - but we can't guarentee it.
+            pass
+        return self.rest_interface.restore_trash_item(self.path(), restore_method, method_argument)
 
     def history(self):
         """NOT IMPLEMENTED: Restore item from trash.

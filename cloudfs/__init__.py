@@ -20,4 +20,5 @@ from filesystem import Filesystem
 from path import Path
 from session import Session
 from user import User
+from private.cloudfs_paths import ExistValues, RestoreValue, VersionConflictValue
 

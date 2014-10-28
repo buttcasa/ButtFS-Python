@@ -9,7 +9,7 @@ from copy import deepcopy
 
 from utils import request_to_string, response_to_string, utf8_quote_plus, make_utf8
 from ..errors import error_from_response, session_not_linked_error, CloudFSError, missing_argument, invalid_argument
-from cloudfs_paths import rest_endpoints, ExistValues, VersionConflictValue
+from cloudfs_paths import rest_endpoints, ExistValues, VersionConflictValue, RestoreValue
 from cached_object import CachedObject
 
 debug = False
@@ -289,7 +289,7 @@ class CloudFSRESTAdapter(CachedObject):
             'name': destination_name
         }
         if exists:
-            if ExistValues.legal_exist_value(exists):
+            if ExistValues.legal_value(exists):
                 data['exists'] = exists
             else:
                 ExistValues.raise_exception(exists)
@@ -370,7 +370,7 @@ class CloudFSRESTAdapter(CachedObject):
                 del data[x]
         map(remove, data.keys())
         if conflict:
-            if not VersionConflictValue.legal_conflict_value(conflict):
+            if not VersionConflictValue.legal_value(conflict):
                 VersionConflictValue.raise_exception(conflict)
             data['version-conflict'] = conflict
         if 'version' not in data:
@@ -451,7 +451,7 @@ class CloudFSRESTAdapter(CachedObject):
         :param reuse_fallback:      Not implemented.
         :param reuse_attributes:    Not implemented.
 
-        :returns:   Dictionary of new file details.
+        :returns:                       Dictionary of new file details.
         :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
         :raises AuthenticatedError:     Based on CloudFS Error Code.
 
@@ -481,7 +481,7 @@ class CloudFSRESTAdapter(CachedObject):
         :param range:               List or tuple with two values containing the range of the request. Second value may be an empty string, but must exist and not be none. Defaults to entire file.
         :param background:          If true, request will return immediately and save_data_function will run in a thread. Defaults to False.
 
-        :returns:           Empty string.
+        :returns:                       Empty string.
         :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
         :raises AuthenticatedError:     Based on CloudFS Error Code.
         :raises InvalidArgument:        Based on CloudFS Error Code.
@@ -493,6 +493,62 @@ class CloudFSRESTAdapter(CachedObject):
                 raise invalid_argument('range argument', 'list type of length 2', range)
             headers['Range'] = 'bytes={}-{}'.format(range[0], range[1])
         return self._make_request('download file', path, response_processor=save_data_function, headers=headers, background=background)
+
+    def list_trash(self, path):
+        """List the contents of a folder in trash.
+
+        REST Documentation: https://www.bitcasa.com/cloudfs-api-docs/api/Browse%20Trash.html
+
+        :param path:        Path to folder to list.
+
+        :returns:                       Dictionary representation of items in folder.
+        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        """
+        return self._make_request('list trash', path)
+
+    def delete_trash_item(self, path):
+        """Permanently remove an item from the users' filesystem.
+
+        Warning: After calling this interface, there is _no way_ to retrieve the item deleted.
+
+        REST Documentation: https://www.bitcasa.com/cloudfs-api-docs/api/Delete%20Trash%20Item.html
+
+        :param path:        Path to item to delete.
+        :return:            None
+        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        """
+        return self._make_request('delete trash item', path)
+
+    def restore_trash_item(self, path, restore_method=RestoreValue.fail, method_argument=None):
+        """Move an item from trash to the mail filesystem.
+
+        Behavior for this call depends on the method selected.
+        fail: Will attempt to move the item to its previous location.
+        rescue: Will attempt to move the item to a different location, supplied in method_argument.
+        recreate: Will attempt to create a new folder at the filesystem root with the name
+
+        REST Documentation: https://www.bitcasa.com/cloudfs-api-docs/api/Recover%20Trash%20Item.html
+
+        :param path:            Path to item to delete.
+        :param restore_method:  Determines method used to restore item.
+        :param method_argument: Expected contents determined by value of restore_method
+        :return:
+        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        """
+        if not RestoreValue.legal_value(restore_method):
+            raise RestoreValue.raise_exception(restore_method)
+        data = {'restore': restore_method}
+        if restore_method == RestoreValue.rescue:
+            if hasattr(method_argument, 'path'):
+                method_argument = method_argument.path()
+            data['rescue-path'] = method_argument
+        elif restore_method == RestoreValue.recreate:
+            data['recreate-path'] = method_argument
+
+        return self._make_request('recover trash item', path, data=data)
 
 
 class CloudFSConnection(object):

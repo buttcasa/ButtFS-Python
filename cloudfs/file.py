@@ -3,7 +3,7 @@ import StringIO
 from item import Item
 from os.path import exists, isdir, split, join
 from errors import method_not_implemented, operation_not_allowed, invalid_argument
-from private.cloudfs_paths import VersionConflictValue
+from private.cloudfs_paths import VersionConflictValue, RestoreValue
 
 class File(Item):
     def __init__(self, rest_interface):
@@ -45,7 +45,18 @@ class File(Item):
         """
         if debug:
             self.rest_interface.debug_requests(1)
-        return self.rest_interface.delete_file(self.path(), commit)
+        if self.in_trash:
+            if commit:
+                return self.rest_interface.delete_trash_item(self.path())
+            else:
+                # nop
+                # we're already in the trash, does not make sense to make a delete call if commit is not true.
+                return {}
+        else:
+            result = self.rest_interface.delete_file(self.path(), commit)
+            if result['success'] and commit == False:
+                self.in_trash = True
+            return result
 
     def save(self, if_conflict=VersionConflictValue.fail, debug=False):
         """Save changes to the file.
@@ -230,4 +241,5 @@ class File(Item):
          raise operation_not_allowed("Setting the size of an Item")
 
     def __str__(self):
-        return "File[{}]:{}({} - {}) {} bytes".format(str(self.path()), self.name, self.extension, self.mime, self.size)
+        trash = 'trash' if self.in_trash else ''
+        return "File[{}{}]:{}({} - {}) {} bytes".format(trash, str(self.path()), self.name.encode('utf-8'), self.extension.encode('utf-8'), self.mime.encode('utf-8'), self.size)

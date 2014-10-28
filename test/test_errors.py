@@ -77,7 +77,7 @@ class FolderErrorTests(SessionTestCase):
 
     def tearDown(self):
         for folder in self.root.list():
-            folder.delete(force=True)
+            folder.delete(force=True, commit=True)
 
 
 class FileErrorTests(SessionTestCase):

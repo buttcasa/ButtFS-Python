@@ -3,40 +3,47 @@
 # We could also offer this as a JSON object in a file to support
 # other implementations.
 
-class ExistValues(object):
+class Values(object):
+
+    allowed = []
+    _name = ''
+
+    @classmethod
+    def legal_value(cls, value):
+        return value in cls.allowed
+
+    @classmethod
+    def raise_exception(cls, value):
+        from ..errors import invalid_argument
+        raise invalid_argument(cls._name, cls.allowed, value)
+
+class ExistValues(Values):
     overwrite = 'overwrite'
     fail = 'fail'
     rename = 'rename'
     reuse = 'reuse'
+    _name = 'exists'
 
     allowed = [overwrite,
                fail,
                rename,
                reuse]
 
-    @staticmethod
-    def legal_exist_value(value):
-        return value in ExistValues.allowed
 
-    @staticmethod
-    def raise_exception(value):
-        from ..errors import invalid_argument
-        raise invalid_argument('exists', ExistValues.allowed, value)
-
-class VersionConflictValue(object):
+class VersionConflictValue(Values):
     fail = 'fail'
     ignore = 'ignore'
+    _name = 'version conflict'
 
     allowed = [fail, ignore]
 
-    @staticmethod
-    def legal_conflict_value(value):
-        return value in VersionConflictValue.allowed
 
-    @staticmethod
-    def raise_exception(value):
-        from ..errors import invalid_argument
-        raise invalid_argument('exists', VersionConflictValue.allowed, value)
+class RestoreValue(Values):
+    fail = 'fail'
+    rescue = 'rescue'
+    recreate = 'recreate'
+
+    allowed = [fail, rescue, recreate]
 
 
 rest_endpoints = {
@@ -173,5 +180,27 @@ rest_endpoints = {
         'url':    '/v2/files{path}',
         'data':   {},
         'method': 'GET'
+    },
+    # REST Documentation: https://www.bitcasa.com/cloudfs-api-docs/api/Browse%20Trash.html
+    'list trash':{
+        'params': {},
+        'url':    '/v2/trash{path}',
+        'data':   {},
+        'method': 'GET'
+    },
+    # REST Documentation: https://www.bitcasa.com/cloudfs-api-docs/api/Delete%20Trash%20Item.html
+    'delete trash item':{
+        'params': {},
+        'url':    '/v2/trash{path}',
+        'data':   {},
+        'method': 'DELETE'
+    },
+    # REST Documentation: https://www.bitcasa.com/cloudfs-api-docs/api/Recover%20Trash%20Item.html
+    'recover trash item':{
+        'params': {},
+        'url':    '/v2/trash{path}',
+        'data':   {'restore': RestoreValue.fail},
+        'method': 'POST'
     }
+
 }

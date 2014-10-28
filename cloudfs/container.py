@@ -24,12 +24,28 @@ class Container(Item):
         """
         if debug:
             self.rest_interface.debug_requests(1)
-        return list_items_from_path(self.rest_interface, self.path())
+        return list_items_from_path(self.rest_interface, self.path(), self.in_trash)
 
     def __str__(self):
         return 'container:' + self.path()
 
 class Folder(Container):
+    @staticmethod
+    def root_folder(rest_interface):
+        f = Folder(rest_interface)
+        f.data = {
+            'name':'ROOT',
+            'id':'',
+            'type':'folder',
+            'is_mirrored': False,
+            'date_content_last_modified':0,
+            'date_created':0,
+            'date_meta_last_modified':0,
+            'application_data':{}
+            }
+
+        return f
+
     def __init__(self, rest_interface):
         super(Folder, self).__init__(rest_interface)
 
@@ -69,7 +85,7 @@ class Folder(Container):
             files['file'].append(custom_mime)
 
         upload_response = self.rest_interface.upload(self.path(), files, exists)
-        return create_items_from_json(self.rest_interface, upload_response, self.path())[0]
+        return create_items_from_json(self.rest_interface, upload_response, self.path(), self.in_trash)[0]
 
     def create_folder(self, container_or_name, exists=ExistValues.fail, debug=False):
         """Create a new folder in this folder.
@@ -90,7 +106,7 @@ class Folder(Container):
             container_or_name = container_or_name.name
 
         new_folder_response = self.rest_interface.create_folder(self.path(), container_or_name, exists)
-        return create_items_from_json(self.rest_interface, new_folder_response, self.path())[0]
+        return create_items_from_json(self.rest_interface, new_folder_response, self.path(), self.in_trash)[0]
 
 
     def save(self, if_conflict=VersionConflictValue.fail, debug=False):
@@ -120,6 +136,8 @@ class Folder(Container):
 
     def delete(self, commit=False, force=False, debug=False):
         """Delete folder.
+        Folder will only be removed from trash if commit is True. This is the case for folders in or out of the trash, so folders
+        that are in the trash already will treat delete(commit=False) calls as a no-op.
 
         REST Documentation: https://www.bitcasa.com/cloudfs-api-docs/api/Delete%20Folder.html
 
@@ -133,7 +151,19 @@ class Folder(Container):
         """
         if debug:
             self.rest_interface.debug_requests(1)
-        return self.rest_interface.delete_folder(self.path(), commit, force)
+        if self.in_trash:
+            if commit:
+                return self.rest_interface.delete_trash_item(self.path())
+            else:
+                # nop
+                # we're already in the trash, does not make sense to make a delete call if commit is not true.
+                return {}
+        else:
+            result =  self.rest_interface.delete_folder(self.path(), commit, force)
+            if result['success'] and commit == False:
+                self.in_trash = True
+            return result
 
     def __str__(self):
-        return "Folder[{}]:{}".format(str(self.path()), self.name)
+        trash = 'trash' if self.in_trash else ''
+        return "Folder[{}{}]:{}".format(trash, str(self.path()), self.name.encode('utf-8'))

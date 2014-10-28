@@ -32,7 +32,9 @@ class CloudFSTestCase(unittest.TestCase):
 
     def test_unimplemented_setters(self):
         def set_attr_helper(property):
-            setattr(self.get_example_object(), property, None)
+            example = self.get_example_object()
+            if example:
+                setattr(example, property, None)
 
         for method in self.UNIMPLEMENTED_SETTERS:
             self.assertRaises(
@@ -43,7 +45,9 @@ class CloudFSTestCase(unittest.TestCase):
 
     def test_forbidden_setters(self):
         def set_attr_helper(property):
-            setattr(self.get_example_object(), property, None)
+            example = self.get_example_object()
+            if example:
+                setattr(example, property, None)
 
         for method in self.FORBIDDEN_SETTERS:
             self.assertRaises(

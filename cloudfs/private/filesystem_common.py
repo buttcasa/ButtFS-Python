@@ -2,12 +2,15 @@ import collections
 
 from ..errors import invalid_argument
 
-def list_items_from_path(rest_interface, path):
-    response = rest_interface.list_folder(path)
+def list_items_from_path(rest_interface, path, in_trash=False):
+    if in_trash:
+        response = rest_interface.list_trash(path)
+    else:
+        response = rest_interface.list_folder(path)
     path = path if str(path) != '/' else None
 
     # only use actual response
-    return create_items_from_json(rest_interface, response, path)
+    return create_items_from_json(rest_interface, response, path, in_trash)
 
 def move_items(rest_interface, items, destination, exists):
     from ..file import File
@@ -50,7 +53,7 @@ def _process_items_by_type(items, operation_dictionary):
                 str(type(item)))
 
 
-def create_items_from_json(rest_interface, data, parent_path):
+def create_items_from_json(rest_interface, data, parent_path, in_trash=False):
     from ..file import File
     from ..container import Folder
     if 'results' in data:
@@ -70,9 +73,9 @@ def create_items_from_json(rest_interface, data, parent_path):
     def create_item(item_json, parent):
         new_item = None
         if item_json['type'] == 'folder':
-            new_item = Folder(rest_interface.get_copy())._create_from_json(item_json, parent)
+            new_item = Folder(rest_interface.get_copy())._create_from_json(item_json, parent, in_trash)
         if item_json['type'] == 'file':
-            new_item = File(rest_interface.get_copy())._create_from_json(item_json, parent)
+            new_item = File(rest_interface.get_copy())._create_from_json(item_json, parent, in_trash)
 
         items.append(new_item)
 

@@ -1,4 +1,4 @@
-# CloudFS-Python Beta Release 0.5
+# CloudFS-Python Beta Release 0.6
 Initial release of the Python SDK for CloudFS. This release allows developers get started building CloudFS-based applications. Unfortunately the functionality is far from complete.
 
 ### Current Functionality
@@ -6,7 +6,6 @@ This release supports a subset of CloudFS functionality. Most operations with fi
 
 Here are the major missing features:
 
-* Trash
 * Shares
 * User Creation
 * File Version History
