@@ -1,5 +1,5 @@
 from test_settings import SessionTestCase
-from cloudfs import errors
+from buttfs import errors
 import unittest
 
 

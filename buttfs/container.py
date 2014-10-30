@@ -3,7 +3,7 @@ import os
 from item import Item
 from path import Path
 from private.filesystem_common import list_items_from_path, create_items_from_json
-from private.cloudfs_paths import VersionConflictValue, ExistValues
+from private.buttfs_paths import VersionConflictValue, ExistValues
 
 
 class Container(Item):
@@ -55,20 +55,20 @@ class Folder(Container):
         return self.rest_interface.folder_get_meta(self.path()), {}
 
     def upload(self, source, custom_name=None, custom_mime=None, exists=ExistValues.fail, data_inline=False, debug=False):
-        """Upload a file or a string to CloudFS.
+        """Upload a file or a string to ButtFS.
 
         REST Documentation: https://www.bitcasa.com/cloudfs-api-docs/api/Upload%20File.html
 
         :param source:          Source of file data. String or path to a file.
-        :param custom_name:     Name of file in CloudFS. If left blank, will use name of file in path.
+        :param custom_name:     Name of file in ButtFS. If left blank, will use name of file in path.
         :param custom_mime:     Mine for new file. If left blank, mime will be detected.
-        :param exists:          Behavior if the given name exists on CloudFS. Defaults to fail.
+        :param exists:          Behavior if the given name exists on ButtFS. Defaults to fail.
         :param data_inline:     Flag to indicate if the source is a string or a filename.
         :param debug:           If true, will print the the request and response to stdout.
 
         :returns:   New file object.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
         """
         if debug:
             self.rest_interface.debug_requests(1)
@@ -96,8 +96,8 @@ class Folder(Container):
         :param debug:               If true, will print the the request and response to stdout.
 
         :returns:       New folder object.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
         """
         if debug:
             self.rest_interface.debug_requests(1)
@@ -119,8 +119,8 @@ class Folder(Container):
         :param debug:       If true, will print the the request and response to stdout.
 
         :returns:   Updated folder object.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
         """
         if debug:
             self.rest_interface.debug_requests(1)
@@ -146,8 +146,8 @@ class Folder(Container):
         :param debug:   If true, will print the the request and response to stdout.
 
         :returns:   Dictionary with keys for success and the deleted folders last version.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
         """
         if debug:
             self.rest_interface.debug_requests(1)

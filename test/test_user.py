@@ -1,22 +1,22 @@
 import unittest
 import datetime
 
-from test_settings import CloudFSTestCase
-from cloudfs.session import Session
-from cloudfs import errors
+from test_settings import ButtFSTestCase
+from buttfs.session import Session
+from buttfs import errors
 
-class UserTests(CloudFSTestCase):
+class UserTests(ButtFSTestCase):
 
     FORBIDDEN_SETTERS = ['id', 'username', 'last_login', 'created_at']
     UNIMPLEMENTED_SETTERS = ['email', 'first_name', 'last_name']
 
     def setUp(self):
-        self.s = Session(self.CLOUDFS_BASE,
-                self.CLOUDFS_ID,
-                self.CLOUDFS_SECRET)
+        self.s = Session(self.BUTTFS_BASE,
+                self.BUTTFS_ID,
+                self.BUTTFS_SECRET)
 
         self.assertRaises(
-            errors.CloudFSError,
+            errors.ButtFSError,
             self.s.get_user
         )
 

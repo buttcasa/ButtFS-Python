@@ -2,34 +2,34 @@ import json
 import inspect
 from private.utils import request_to_string, response_to_string
 
-class CloudFSError(Exception):
+class ButtFSError(Exception):
     def __init__(self, message):
         self.message = message
 
     def __str__(self):
         return self.message
 
-class SessionNotLinked(CloudFSError):
+class SessionNotLinked(ButtFSError):
     def __init__(self):
         self.message = 'Session is not linked.'
 
-class OperationNotAllowed(CloudFSError):
+class OperationNotAllowed(ButtFSError):
     def __init__(self, op_name):
-        self.message = '{} is not possible in Cloudfs. If you cannot work around this limitation, please contact CloudFS support.'.format(op_name)
+        self.message = '{} is not possible in Buttfs. If you cannot work around this limitation, please contact ButtFS support.'.format(op_name)
 
-class InvalidArgument(CloudFSError):
+class InvalidArgument(ButtFSError):
     def __init__(self, arg, expected, actual):
         self.message = 'Value for "{}" argument is not allowed. Expected {}, but argument had/was {}({}).'.format(
                 arg, expected, actual, type(actual)
             )
 
-class MissingArgument(CloudFSError):
+class MissingArgument(ButtFSError):
     def __init__(self, arg_name):
         self.message = 'This call requires a {} argument.'.format(arg_name)
 
-class MethodNotImplemented(CloudFSError):
+class MethodNotImplemented(ButtFSError):
     def __init__(self, object, method_name):
-        self.message = 'The \"{}\" method of the {} is not currently implemented. To find out the future plans for this method contact CloudFS support.'.format(method_name, type(object))
+        self.message = 'The \"{}\" method of the {} is not currently implemented. To find out the future plans for this method contact ButtFS support.'.format(method_name, type(object))
 
 def session_not_linked_error():
     return SessionNotLinked()
@@ -46,7 +46,7 @@ def missing_argument(arg_name):
 def method_not_implemented(object, method_name):
     return MethodNotImplemented(object, method_name)
 
-class AuthenticatedError(CloudFSError):
+class AuthenticatedError(ButtFSError):
     INTERNAL_CODE = None
 
     def __init__(self, request, response, message = '', code=None):
@@ -82,14 +82,14 @@ class AuthenticatedError(CloudFSError):
 class UnknownError(AuthenticatedError):
     def __str__(self):
         super_str = super(UnknownError, self).__str__()
-        return "CloudFS returned an error with an unexpected error code! Please forward this exceptions' text to CloudFS support:\n" + super_str
+        return "ButtFS returned an error with an unexpected error code! Please forward this exceptions' text to ButtFS support:\n" + super_str
 
 class InvalidRequest(AuthenticatedError):
     # No code for malformed request
     INTERNAL_CODE = None
 
 class GenericPanicError(AuthenticatedError):
-    # generic error for when something goes wrong on CloudFS's end
+    # generic error for when something goes wrong on ButtFS's end
     INTERNAL_CODE = 9999
 
 # API Errors
@@ -364,7 +364,7 @@ def error_from_response(request, response):
             try:
                 error_class = _error_index[code]
             except KeyError:
-                # CloudFS instead of authenticated error because we don't really know
+                # ButtFS instead of authenticated error because we don't really know
                 raise UnknownError(request, response, message)
 
             return error_class(request, response, message)

@@ -93,6 +93,6 @@ class User(CachedObject):
                 'last_name': self.last_name}
 
     def __str__(self):
-        return "CloudFS::User{dict}".format(
+        return "ButtFS::User{dict}".format(
             dict=self.__dict__()
         )

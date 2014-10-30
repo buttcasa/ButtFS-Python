@@ -1,9 +1,9 @@
 from test_settings import SessionTestCase
-from cloudfs.private.cloudfs_paths import ExistValues, RestoreValue
+from buttfs.private.buttfs_paths import ExistValues, RestoreValue
 
 import unittest
 
-from cloudfs.errors import GenericPanicError, PathDoesNotExist
+from buttfs.errors import GenericPanicError, PathDoesNotExist
 
 # Functional tests based around file creation & modification
 class TrashFunctionalTests(SessionTestCase):

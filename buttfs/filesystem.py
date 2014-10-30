@@ -1,6 +1,6 @@
 from private.filesystem_common import *
 from errors import method_not_implemented
-from private.cloudfs_paths import ExistValues, RestoreValue
+from private.buttfs_paths import ExistValues, RestoreValue
 from container import Folder
 
 from item import Item
@@ -19,8 +19,8 @@ class Filesystem(object):
         :param debug:   If true, will print the the request and response to stdout.
 
         :returns:   Dictionary representation of JSON response.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
         """
         path = item
         in_trash = False
@@ -57,8 +57,8 @@ class Filesystem(object):
         :param debug:       If true, will print the the request and response to stdout.
 
         :returns:   Details of the new item(s) in a dictionary.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
         """
         if debug:
             self.rest_interface.debug_requests(1)
@@ -73,8 +73,8 @@ class Filesystem(object):
         :param debug:       If true, will print the the request and response to stdout.
 
         :returns:   Details of the new item(s) in a dictionary.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
         """
         if debug:
             self.rest_interface.debug_requests(1)

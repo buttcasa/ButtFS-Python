@@ -1,7 +1,7 @@
 from test_settings import SessionTestCase
 import unittest
 
-from cloudfs.errors import MethodNotImplemented
+from buttfs.errors import MethodNotImplemented
 
 
 class FilesystemTests(SessionTestCase):

@@ -5,18 +5,18 @@ if __package__ is None:
 
 import unittest
 import datetime
-from cloudfs.session import Session
-from cloudfs.errors import OperationNotAllowed, MethodNotImplemented
+from buttfs.session import Session
+from buttfs.errors import OperationNotAllowed, MethodNotImplemented
 
 
-class CloudFSTestCase(unittest.TestCase):
-    # fill in with the details from your cloudfs account
+class ButtFSTestCase(unittest.TestCase):
+    # fill in with the details from your buttfs account
     # Application Client ID
-    CLOUDFS_ID = ''
+    BUTTFS_ID = ''
     # Application Secret
-    CLOUDFS_SECRET = ''
+    BUTTFS_SECRET = ''
     # Application API Server
-    CLOUDFS_BASE = ''
+    BUTTFS_BASE = ''
 
     # user settings
     TEST_USER_EMAIL = ''
@@ -60,11 +60,11 @@ class CloudFSTestCase(unittest.TestCase):
         now = datetime.datetime.now()
         return now - datetime.timedelta(microseconds=now.microsecond)
 
-class SessionTestCase(CloudFSTestCase):
+class SessionTestCase(ButtFSTestCase):
     def setUp(self):
-        self.s = Session(self.CLOUDFS_BASE,
-                self.CLOUDFS_ID,
-                self.CLOUDFS_SECRET)
+        self.s = Session(self.BUTTFS_BASE,
+                self.BUTTFS_ID,
+                self.BUTTFS_SECRET)
 
         self.s.authenticate(self.TEST_USER_EMAIL, self.TEST_USER_PASSWORD)
         self.assertEqual(True, self.s.is_linked(), "Authentication failed.")

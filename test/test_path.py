@@ -1,10 +1,10 @@
-from test_settings import CloudFSTestCase
-from cloudfs.path import Path
-from cloudfs.item import Item
+from test_settings import ButtFSTestCase
+from buttfs.path import Path
+from buttfs.item import Item
 import unittest
 
 
-class PathTests(CloudFSTestCase):
+class PathTests(ButtFSTestCase):
     def test_path_string_root(self):
         p = Path.path_from_string("/")
         self.assertEqual(len(p), 1, "Path with only root was not length 1.")

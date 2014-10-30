@@ -1,6 +1,6 @@
 
 from private.filesystem_common import move_items, copy_items
-from private.cloudfs_paths import VersionConflictValue, ExistValues, RestoreValue
+from private.buttfs_paths import VersionConflictValue, ExistValues, RestoreValue
 from errors import operation_not_allowed, method_not_implemented
 from private.cached_object import CachedObject
 from path import Path
@@ -80,7 +80,7 @@ class Item(CachedObject):
     @property
     def is_mirrored(self):
         """
-        Limited applications in CloudFS.
+        Limited applications in ButtFS.
         :return: Boolean indicating if this item was created by mirroring a file on the users' desktop.
         """
         return self.data['is_mirrored']
@@ -155,8 +155,8 @@ class Item(CachedObject):
         :param debug:       If true, will print the the request and response to stdout.
 
         :returns:   Details of the new item in a dictionary.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
         """
         if debug:
             self.rest_interface.debug_requests(1)
@@ -173,8 +173,8 @@ class Item(CachedObject):
         :param debug:       If true, will print the the request and response to stdout.
 
         :returns:   Details of the new item in a dictionary.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
         """
         if debug:
             self.rest_interface.debug_requests(1)

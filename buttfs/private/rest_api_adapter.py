@@ -8,16 +8,16 @@ import threading
 from copy import deepcopy
 
 from utils import request_to_string, response_to_string, utf8_quote_plus, make_utf8
-from ..errors import error_from_response, session_not_linked_error, CloudFSError, missing_argument, invalid_argument
-from cloudfs_paths import rest_endpoints, ExistValues, VersionConflictValue, RestoreValue
+from ..errors import error_from_response, session_not_linked_error, ButtFSError, missing_argument, invalid_argument
+from buttfs_paths import rest_endpoints, ExistValues, VersionConflictValue, RestoreValue
 from cached_object import CachedObject
 
 debug = False
 
-class CloudFSRESTAdapter(CachedObject):
+class ButtFSRESTAdapter(CachedObject):
     def __init__(self, url_root, client_id, secret,  auth_token=''):
-        super(CloudFSRESTAdapter, self).__init__()
-        self.bc_conn = CloudFSConnection(url_root, client_id, secret,  auth_token)
+        super(ButtFSRESTAdapter, self).__init__()
+        self.bc_conn = ButtFSConnection(url_root, client_id, secret,  auth_token)
         self.linked = False
         self.debug_count = 0
 
@@ -31,7 +31,7 @@ class CloudFSRESTAdapter(CachedObject):
         try:
             self.ping()
             self.linked = True
-        except CloudFSError:
+        except ButtFSError:
             self.linked = False
 
     def wait_for_downloads(self, timeout=None):
@@ -50,7 +50,7 @@ class CloudFSRESTAdapter(CachedObject):
         refreshing their information as time goes on. However, we can change
         behavior in the future.
 
-        :returns:   A CloudFSRESTAdapter that is authenticated to the same account as self.
+        :returns:   A ButtFSRESTAdapter that is authenticated to the same account as self.
 
         """
         return deepcopy(self)
@@ -79,7 +79,7 @@ class CloudFSRESTAdapter(CachedObject):
         return self.bc_conn.last_request_log
 
     def is_linked(self):
-        """Return if this CloudFSRESTAdapter can currently make requests.
+        """Return if this ButtFSRESTAdapter can currently make requests.
         Does not use up an API request.
 
         :returns:       True if this is authenticated to the server. False otherwise.
@@ -91,7 +91,7 @@ class CloudFSRESTAdapter(CachedObject):
         return self.linked
 
     def unlink(self):
-        """Clear current authentication information associated with this CloudFSRESTAdapter
+        """Clear current authentication information associated with this ButtFSRESTAdapter
 
         :returns:       None
 
@@ -112,20 +112,20 @@ class CloudFSRESTAdapter(CachedObject):
     def _make_request(self, request_name, path=None, data={}, params={}, headers={}, response_processor=None, files=None, oauth_request=False, background=False):
         """Makes a request after merging standard request parameters with user-supplied data
 
-        :param request_name:        Index into the rest_endpoints table in cloudfs_paths.py.
-        :param path:                Path in the CloudFS Filesystem. Optional.
+        :param request_name:        Index into the rest_endpoints table in buttfs_paths.py.
+        :param path:                Path in the ButtFS Filesystem. Optional.
         :param data:                Post data in encoded in dictionary. Optional.
         :param params:              URL Parameters in dictionary. Optional.
         :params headers:            Headers in dictionary. Optional.
         :param response_processor:  Function to process response value. Optional.
         :param files:               Files to post. Optional.
-        :param oauth_request:       Flag to indicate if this is an 'oauth' request (does not follow strict oauth flow, see CloudFS docs). Optional.
+        :param oauth_request:       Flag to indicate if this is an 'oauth' request (does not follow strict oauth flow, see ButtFS docs). Optional.
         :param background:          Flag to indicate if this request should return before completing the entire body
 
         :returns:   Dictionary of JSON request or string of response body. True or False for oauth_request.
         :raises ValueError:             request_name is not found in rest_endpoints.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS returns an error.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS returns an error.
 
         """
         try:
@@ -157,7 +157,7 @@ class CloudFSRESTAdapter(CachedObject):
             return self.bc_conn.request(url, merged_data, merged_params, files, request_data['method'], response_processor, headers, background)
 
     def authenticate(self, username, password):
-        """Authenticate to CloudFS using the provided user details.
+        """Authenticate to ButtFS using the provided user details.
 
         REST Documentation: https://www.bitcasa.com/cloudfs-api-docs/api/Oauth2%20Password%20Credentials%20Grant.html
 
@@ -179,7 +179,7 @@ class CloudFSRESTAdapter(CachedObject):
         REST Documentation: https://www.bitcasa.com/cloudfs-api-docs/api/Ping.html
 
         :returns:   Empty string if successful, exception if not.
-        :raises:    SessionNotLinked if the CloudFSRESTAdapter is not authenticated.
+        :raises:    SessionNotLinked if the ButtFSRESTAdapter is not authenticated.
 
         """
         return self._make_request('ping')
@@ -192,8 +192,8 @@ class CloudFSRESTAdapter(CachedObject):
         :param path:    Path to folder to list.
 
         :returns:   Dictionary representation of JSON response.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
 
         """
         return self._make_request('list folder', path)
@@ -204,8 +204,8 @@ class CloudFSRESTAdapter(CachedObject):
         REST Documentation: https://www.bitcasa.com/cloudfs-api-docs/api/Get%20Profile.html
 
         :returns:   Dictionary encoding of the user profile information.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
 
         """
         return self._make_request('get user profile')
@@ -217,8 +217,8 @@ class CloudFSRESTAdapter(CachedObject):
         :param data:    Dictionary of settings to change
 
         :returns:   Dictionary with a key indicating success.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
 
         """
         return self._make_request('change user profile', data=data)
@@ -233,8 +233,8 @@ class CloudFSRESTAdapter(CachedObject):
         :parm exists:   Behavior if folder name already exists. Default Value overwrite
 
         :returns:   Dictionary encoded information about the new folder.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
 
         """
         data = {
@@ -253,8 +253,8 @@ class CloudFSRESTAdapter(CachedObject):
         :param force:       If true, will delete folder even if it contains Items. Defaults to False.
 
         :returns:   Dictionary with keys for success and the deleted folders last version.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
 
         """
         params = {
@@ -273,8 +273,8 @@ class CloudFSRESTAdapter(CachedObject):
         :param commit:      If true, will permanently remove the file. Will move to trash otherwise. Defaults to False.
 
         :returns:   Dictionary with keys for success and the deleted files last version.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
 
         """
         params = {
@@ -307,8 +307,8 @@ class CloudFSRESTAdapter(CachedObject):
         :param exists:              How to handle if an item of the same name exists in the destination folder. Defaults to rename.
 
         :returns:   Details of the new item in a dictionary.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
 
         """
         return self._common_file_operation('move file', path, destination, destination_name, exists)
@@ -324,8 +324,8 @@ class CloudFSRESTAdapter(CachedObject):
         :param exists:              How to handle if an item of the same name exists in the destination folder. Defaults to rename.
 
         :returns:   Details of the new item in a dictionary.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
 
         """
         return self._common_file_operation('move folder', path, destination, destination_name, exists)
@@ -341,8 +341,8 @@ class CloudFSRESTAdapter(CachedObject):
         :param exists:              How to handle if an item of the same name exists in the destination folder. Defaults to rename.
 
         :returns:   Details of the new item in a dictionary.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
 
         """
         return self._common_file_operation('copy file', path, destination, destination_name, exists)
@@ -358,8 +358,8 @@ class CloudFSRESTAdapter(CachedObject):
         :param exists:              How to handle if an item of the same name exists in the destination folder. Defaults to rename.
 
         :returns:   Details of the new item in a dictionary.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
 
         """
         return self._common_file_operation('copy folder', path, destination, destination_name, exists)
@@ -385,11 +385,11 @@ class CloudFSRESTAdapter(CachedObject):
 
         :param path:        Path of file to alter.
         :param data:        Dictionary of value keys and their new values.
-        :param conflict:    Behavior if the file has been updated since retrieving it from Cloudfs.
+        :param conflict:    Behavior if the file has been updated since retrieving it from Buttfs.
 
         :returns:   Dictionary with new file details stored under the 'meta' key.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
 
         """
         whitelist = ['name', 'date_created', 'date_meta_last_modified', 'application_data', 'mime', 'version']
@@ -402,11 +402,11 @@ class CloudFSRESTAdapter(CachedObject):
 
         :param path:        Path of folder to alter.
         :param data:        Dictionary of value keys and their new values.
-        :param conflict:    Behavior if the folder has been updated since retrieving it from Cloudfs.
+        :param conflict:    Behavior if the folder has been updated since retrieving it from Buttfs.
 
         :returns:   Dictionary with new folder details stored under the 'meta' key.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
 
         """
         whitelist = ['name', 'date_created', 'date_meta_last_modified', 'application_data', 'version']
@@ -420,8 +420,8 @@ class CloudFSRESTAdapter(CachedObject):
         :param path:    Path to file.
 
         :returns:   Dictionary with file details.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
 
         """
         return self._make_request('get file meta', path)
@@ -434,14 +434,14 @@ class CloudFSRESTAdapter(CachedObject):
         :param path:    Path to file.
 
         :returns:   Dictionary with folder details.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
 
         """
         return self._make_request('get folder meta', path)
 
     def upload(self, path, file, exists=None, reuse_fallback=None, reuse_attributes=None):
-        """Upload a file to Cloudfs.
+        """Upload a file to Buttfs.
 
         REST Documentation: https://www.bitcasa.com/cloudfs-api-docs/api/Upload%20File.html
 
@@ -452,8 +452,8 @@ class CloudFSRESTAdapter(CachedObject):
         :param reuse_attributes:    Not implemented.
 
         :returns:                       Dictionary of new file details.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
 
         """
         data = {}
@@ -482,9 +482,9 @@ class CloudFSRESTAdapter(CachedObject):
         :param background:          If true, request will return immediately and save_data_function will run in a thread. Defaults to False.
 
         :returns:                       Empty string.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
-        :raises InvalidArgument:        Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
+        :raises InvalidArgument:        Based on ButtFS Error Code.
 
         """
         headers = {}
@@ -502,8 +502,8 @@ class CloudFSRESTAdapter(CachedObject):
         :param path:        Path to folder to list.
 
         :returns:                       Dictionary representation of items in folder.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
         """
         return self._make_request('list trash', path)
 
@@ -516,8 +516,8 @@ class CloudFSRESTAdapter(CachedObject):
 
         :param path:        Path to item to delete.
         :return:            None
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
         """
         return self._make_request('delete trash item', path)
 
@@ -535,8 +535,8 @@ class CloudFSRESTAdapter(CachedObject):
         :param restore_method:  Determines method used to restore item.
         :param method_argument: Expected contents determined by value of restore_method
         :return:
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
         """
         if not RestoreValue.legal_value(restore_method):
             raise RestoreValue.raise_exception(restore_method)
@@ -551,9 +551,9 @@ class CloudFSRESTAdapter(CachedObject):
         return self._make_request('recover trash item', path, data=data)
 
 
-class CloudFSConnection(object):
+class ButtFSConnection(object):
     def __init__(self, url_root, client_id, secret,  auth_token=''):
-        super(CloudFSConnection, self).__init__()
+        super(ButtFSConnection, self).__init__()
         self.url_root = url_root.strip('/')
         self.client_id = client_id
         self.secret = secret

@@ -3,7 +3,7 @@ from container import Folder
 from errors import (
     # SDK errors
     SessionNotLinked, OperationNotAllowed, InvalidArgument, MissingArgument, MethodNotImplemented,
-    # CloudFS Server Errors
+    # ButtFS Server Errors
     AuthenticatedError, GenericPanicError,
     # Filesystem error
     VersionMismatchIgnored,
@@ -20,5 +20,5 @@ from filesystem import Filesystem
 from path import Path
 from session import Session
 from user import User
-from private.cloudfs_paths import ExistValues, RestoreValue, VersionConflictValue
+from private.buttfs_paths import ExistValues, RestoreValue, VersionConflictValue
 

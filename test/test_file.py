@@ -1,5 +1,5 @@
 from test_settings import SessionTestCase
-from cloudfs.private.cloudfs_paths import ExistValues
+from buttfs.private.buttfs_paths import ExistValues
 
 import unittest
 import time
@@ -7,7 +7,7 @@ import os
 import shutil
 import datetime
 
-from cloudfs.errors import MethodNotImplemented
+from buttfs.errors import MethodNotImplemented
 
 # Functional tests based around file creation & modification
 class FileFunctionalTests(SessionTestCase):

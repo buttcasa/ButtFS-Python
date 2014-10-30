@@ -3,7 +3,7 @@ import StringIO
 from item import Item
 from os.path import exists, isdir, split, join
 from errors import method_not_implemented, operation_not_allowed, invalid_argument
-from private.cloudfs_paths import VersionConflictValue, RestoreValue
+from private.buttfs_paths import VersionConflictValue, RestoreValue
 
 class File(Item):
     def __init__(self, rest_interface):
@@ -40,8 +40,8 @@ class File(Item):
         :param debug:   If true, will print the the request and response to stdout.
 
         :returns:   Dictionary with keys for success and the deleted files last version.
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
         """
         if debug:
             self.rest_interface.debug_requests(1)
@@ -64,12 +64,12 @@ class File(Item):
 
         REST Documentation: https://www.bitcasa.com/cloudfs-api-docs/api/Alter%20File%20Meta.html
 
-        :param if_conflict:    Behavior if the file has been updated since retrieving it from Cloudfs.
+        :param if_conflict:    Behavior if the file has been updated since retrieving it from Buttfs.
         :param debug:          If true, will print the the request and response to stdout.
 
         :returns:  Updated file object
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
         """
         if debug:
             self.rest_interface.debug_requests(1)
@@ -96,7 +96,7 @@ class File(Item):
     def download(self, local_path, custom_name=None, synchronous=False, debug=False):
         """Download the file to the local filesystem.
         Does not replicate any metadata.
-        If downloads are started with synchronous=True CloudFS SDK will attempt to block until all downloads are complete on destruction. This may block your
+        If downloads are started with synchronous=True ButtFS SDK will attempt to block until all downloads are complete on destruction. This may block your
         program from exiting. To avoid this, call wait_for_downloads at least once with any arguments (i.e. call with a timeout of 0 to halt downloads immediately)
 
         REST Documentation: https://www.bitcasa.com/cloudfs-api-docs/api/Download%20File.html
@@ -106,9 +106,9 @@ class File(Item):
         :param synchronous: If true, download will return immediately and download in separate thread.
         :param debug:       If true, will print the the request and response to stdout.
         :return: None
-        :raises SessionNotLinked:       CloudFSRESTAdapter is not authenticated.
-        :raises AuthenticatedError:     Based on CloudFS Error Code.
-        :raises InvalidArgument:        Based on CloudFS Error Code.
+        :raises SessionNotLinked:       ButtFSRESTAdapter is not authenticated.
+        :raises AuthenticatedError:     Based on ButtFS Error Code.
+        :raises InvalidArgument:        Based on ButtFS Error Code.
         """
         if debug:
             self.rest_interface.debug_requests(1)
@@ -147,7 +147,7 @@ class File(Item):
     def read(self, size=None, debug=False):
         """File-like interface to read file. Reads size bytes from last offset.
         Reads file synchronously - does not start threads.
-        Warning: Each read() call generates on request to CloudFS.
+        Warning: Each read() call generates on request to ButtFS.
 
         REST Documentation: https://www.bitcasa.com/cloudfs-api-docs/api/Download%20File.html
 

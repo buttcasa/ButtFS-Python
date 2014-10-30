@@ -97,7 +97,7 @@ def response_to_string(response):
         if 'error' in response_json and response_json['error'] and ('code' in response_json['error'] and 'message' in response_json['error']):
             code = int(response_json['error']['code'])
             message = response_json['error']['message'].encode('utf-8')
-            code_and_message = '\nCloudFS Error Code: {}\nCloudFS Message: {}'.format(code, message)
+            code_and_message = '\nButtFS Error Code: {}\nButtFS Message: {}'.format(code, message)
 
         content = 'Body:\n{}'.format(pprint.pformat(response_json))
     except:
@@ -107,9 +107,9 @@ def response_to_string(response):
         content = 'Body:\n{}'.format(response.content)
 
 
-    return 'HTTP Code: {code}{cloudfs_message}\n{response_headers}{content}'.format(
+    return 'HTTP Code: {code}{buttfs_message}\n{response_headers}{content}'.format(
         code=response.status_code,
-        cloudfs_message=code_and_message,
+        buttfs_message=code_and_message,
         response_headers=dict_string(response.headers),
         content=content
     )

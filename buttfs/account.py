@@ -43,7 +43,7 @@ class Account(CachedObject):
     @property
     def over_storage_limit(self):
         """
-        :return: If CloudFS thinks you are currently over your storage quota.
+        :return: If ButtFS thinks you are currently over your storage quota.
         """
         return self.data['request']['storage']['otl']
 
@@ -64,14 +64,14 @@ class Account(CachedObject):
     @property
     def plan(self):
         """
-        :return: Human readable name of the accounts' CloudFS plan
+        :return: Human readable name of the accounts' ButtFS plan
         """
         return self.data['request']['account_plan']['display_name']
 
     @property
     def plan_id(self):
         """
-        :return: String id of the CloudFS plan.
+        :return: String id of the ButtFS plan.
         """
         return self.data['request']['account_plan']['id']
 

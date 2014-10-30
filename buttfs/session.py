@@ -1,4 +1,4 @@
-from private.rest_api_adapter import CloudFSRESTAdapter
+from private.rest_api_adapter import ButtFSRESTAdapter
 
 from user import User
 from account import Account
@@ -7,7 +7,7 @@ from errors import session_not_linked_error
 
 class Session(object):
     def __init__(self, endpoint, client_id, client_secret):
-        self.rest_interface = CloudFSRESTAdapter(endpoint, client_id, client_secret)
+        self.rest_interface = ButtFSRESTAdapter(endpoint, client_id, client_secret)
         self.endpoint = endpoint
         self.client_id = client_id
         self.client_secret = client_secret

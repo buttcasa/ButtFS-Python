@@ -1,6 +1,6 @@
 import time
 
-from ..errors import CloudFSError
+from ..errors import ButtFSError
 
 class CachedObject(object):
     # no caching by default

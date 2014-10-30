@@ -1,22 +1,22 @@
 import unittest
 
-from test_settings import CloudFSTestCase
-from cloudfs.session import Session
-from cloudfs import errors
+from test_settings import ButtFSTestCase
+from buttfs.session import Session
+from buttfs import errors
 
-class AccountTest(CloudFSTestCase):
+class AccountTest(ButtFSTestCase):
 
     FORBIDDEN_SETTERS = ['id', 'usage', 'state_string', 'state_id',
                            'plan_id', 'over_storage_limit', 'usage',
                            'limit', 'plan']
 
     def setUp(self):
-        self.s = Session(self.CLOUDFS_BASE,
-                self.CLOUDFS_ID,
-                self.CLOUDFS_SECRET)
+        self.s = Session(self.BUTTFS_BASE,
+                self.BUTTFS_ID,
+                self.BUTTFS_SECRET)
 
         self.assertRaises(
-            errors.CloudFSError,
+            errors.ButtFSError,
             self.s.get_account
         )
 
@@ -31,7 +31,7 @@ class AccountTest(CloudFSTestCase):
         # basic field check
         self.assertTrue(acct.usage >= 0, 'Usage expected to be above 0!')
         self.assertEqual(acct.limit, None, 'Quota expected to be at "free" levels!')
-        self.assertEqual(acct.plan, u'CloudFS End User', 'Account should be CloudFS End User Apparently!')
+        self.assertEqual(acct.plan, u'ButtFS End User', 'Account should be ButtFS End User Apparently!')
         self.assertTrue(acct.id is not '', 'Empty account id.')
         self.assertEqual(acct.usage < acct.limit, acct.over_storage_limit, 'Over storage limit flag does not reflect storage numbers!')
         self.assertEqual(acct.state_string, 'Active', 'Account is active!')
